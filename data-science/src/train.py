@@ -7,11 +7,10 @@ Trains ML model using the training dataset and evaluates using the test dataset.
 import argparse
 from pathlib import Path
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import mlflow
 import mlflow.sklearn
-from matplotlib import pyplot as plt
 
 def parse_args():
     '''Parse input arguments'''
