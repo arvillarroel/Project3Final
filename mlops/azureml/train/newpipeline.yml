@@ -2,12 +2,12 @@ $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
 display_name: machine_failure_training_pipeline
 experiment_name: machine-failure-training
-description: Training Pipeline to predict machine failure using Decision Tree classifier
+description: Training Pipeline to predict
 
 inputs:
   input:
     type: uri_file
-    path: azureml:machine-failure-data@latest
+    path: azureml:car-price-data@latest
 
 outputs:
   train_data:
