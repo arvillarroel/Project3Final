@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument("--model_output", type=str, help="Path of output model")
     parser.add_argument('--n_estimators', type=int, default=5,
                         help='The number of trees in the forest')  # Specify the type and default value for n_estimators
-    parser.add_argument('--max_depth', type=int, default=None,
+    parser.add_argument('--max_depth', type=str, default=None,
                         help='The maximum depth of the tree')  # Specify the type and default value for max_depth
 
     args = parser.parse_args()
