@@ -20,10 +20,10 @@ def parse_args():
     parser.add_argument("--train_data", type=str, help="Path to train dataset")
     parser.add_argument("--test_data", type=str, help="Path to test dataset")
     parser.add_argument("--model_output", type=str, help="Path of output model")
-    parser.add_argument('--criterion', type=str, default='gini',
-                        help='The function to measure the quality of a split')
+    parser.add_argument('--n_estimators', type=int, default=5,
+                        help='The number of trees in the forest')  # Specify the type and default value for n_estimators
     parser.add_argument('--max_depth', type=int, default=None,
-                        help='The maximum depth of the tree. If None, then nodes are expanded until all the leaves contain less than min_samples_split samples.')
+                        help='The maximum depth of the tree')  # Specify the type and default value for max_depth
 
     args = parser.parse_args()
 
@@ -37,28 +37,27 @@ def main(args):
     test_df = pd.read_csv(Path(args.test_data)/"test.csv")
 
     # Split the data into input(X) and output(y)
-    y_train = train_df['Failure']
-    X_train = train_df.drop(columns=['Failure'])
-    y_test = test_df['Failure']
-    X_test = test_df.drop(columns=['Failure'])
+    y_train = train_df['price']
+    X_train = train_df.drop(columns=['price'])
+    y_test = test_df['price']
+    X_test = test_df.drop(columns=['price'])
 
     # Initialize and train a Decision Tree Classifier
-    model = DecisionTreeClassifier(criterion=args.criterion, max_depth=args.max_depth)
+    model = RandomForestRegressor(n_estimators=args.n_estimators, max_depth=args.max_depth, random_state=42)  # Provide the arguments for RandomForestRegressor
     model.fit(X_train, y_train)
 
     # Log model hyperparameters
-    mlflow.log_param("model", "DecisionTreeClassifier")
-    mlflow.log_param("criterion", args.criterion)
+    mlflow.log_param("model", "RandomForestRegressor")
+    mlflow.log_param("n_estimators", args.n_estimators)
     mlflow.log_param("max_depth", args.max_depth)
 
     # Predict using the Decision Tree Model on test data
     yhat_test = model.predict(X_test)
 
-    # Compute and log accuracy score
-    accuracy = accuracy_score(y_test, yhat_test)
-    print(f'Accuracy of Decision Tree classifier on test set: {accuracy:.2f}')
-    # Logging the accuracy score as a metric
-    mlflow.log_metric("Accuracy", float(accuracy))
+    # Compute and log mean squared error for test data
+    mse = mean_squared_error(y_test, yhat_test)
+    print('Mean Squared Error of RandomForest Regressor on test set: {:.2f}'.format(mse))
+    mlflow.log_metric("MSE", float(mse))  # Log the MSE
 
     # Save the model
     mlflow.sklearn.save_model(sk_model=model, path=args.model_output)
@@ -74,7 +73,7 @@ if __name__ == "__main__":
         f"Train dataset input path: {args.train_data}",
         f"Test dataset input path: {args.test_data}",
         f"Model output path: {args.model_output}",
-        f"Criterion: {args.criterion}",
+        f"Number of Estimators: {args.n_estimators}",
         f"Max Depth: {args.max_depth}"
     ]
 
